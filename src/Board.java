@@ -33,7 +33,16 @@ public class Board {
 	}
 
 	public Board cloneBoard() {
-		Board boardClone = new Board(this.width, this.height, this.gameBoard);
+	    int[][] clonedState = new int[height][width];
+	    
+	    //copy board state
+	    for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                clonedState[row][column] = gameBoard[row][column];
+            }
+        }
+	    
+		Board boardClone = new Board(width, height, clonedState);
 		return boardClone;
 	}
 

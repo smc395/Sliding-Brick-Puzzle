@@ -83,7 +83,22 @@ public class Game {
             int pieceColumn = move.getMovePiece().getPostions().get(j).getColumn();
             gameBoard[pieceRow][pieceColumn] = 0;
         }
-        
-        board.displayBoard();
+    }
+
+    public Board applyMoveCloning(Board board, Move move){
+        Board newBoard = board.cloneBoard();
+        applyMove(newBoard, move);
+        return newBoard;
+    }
+    
+    public boolean identicalStates(Board b1, Board b2){
+        for(int k = 0; k < b1.getHeight(); k++){
+            for(int m = 0; m < b1.getWidth(); m++){
+                if(b1.getGameBoard()[k][m] != b2.getGameBoard()[k][m]){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
