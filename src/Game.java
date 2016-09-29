@@ -1,13 +1,10 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Game {
 
     private Board board;
-    private Map<Integer, Piece> boardPieces = new HashMap<Integer, Piece>();
     private boolean solved = false;
 
     public void loadGameState(String fileName) throws NumberFormatException, IOException {
@@ -44,30 +41,6 @@ public class Game {
         board = new Board(width, height, newBoard);
     }
 
-    public void populatePieces() {
-        int[][] gameBoard = board.getGameBoard();
-
-        // loop through board and create unique pieces
-        for (int row = 0; row < board.getHeight(); row++) {
-            for (int column = 0; column < board.getWidth(); column++) {
-                int boardValue = gameBoard[row][column];
-                if (boardValue > 1) {
-                    Position position = new Position(row, column);
-                    if (boardPieces.containsKey(boardValue)) {
-                        boardPieces.get(boardValue).getPostions().add(position);
-                    } else {
-                        Piece piece = new Piece(boardValue);
-                        piece.getPostions().add(position);
-                        if (boardValue == 2) {
-                            piece.setMasterPiece();
-                        }
-                        boardPieces.put(boardValue, piece);
-                    }
-                }
-            }
-        }
-    }
-
     public void setBoard(Board b) {
         board = b;
     }
@@ -78,10 +51,6 @@ public class Game {
 
     public boolean getPuzzleSolved() {
         return solved;
-    }
-
-    public Map<Integer, Piece> getPieces(){
-        return boardPieces;
     }
     
     public void puzzleCompleteCheck() {
@@ -99,4 +68,22 @@ public class Game {
         }
     }
 
+    public void applyMove(Board board, Move move){
+        int[][] gameBoard = board.getGameBoard();
+        
+        //move position of piece to selected direction
+        for(int i = 0; i < move.getSelectedMove().size(); i++){
+            int pieceRow = move.getSelectedMove().get(i).getRow();
+            int pieceColumn = move.getSelectedMove().get(i).getColumn();
+            gameBoard[pieceRow][pieceColumn] = move.getMovePiece().getPieceNumber();
+        }
+        //replace piece positions with zeros
+        for(int j = 0; j < move.getMovePiece().getPostions().size(); j++){
+            int pieceRow = move.getMovePiece().getPostions().get(j).getRow();
+            int pieceColumn = move.getMovePiece().getPostions().get(j).getColumn();
+            gameBoard[pieceRow][pieceColumn] = 0;
+        }
+        
+        board.displayBoard();
+    }
 }
