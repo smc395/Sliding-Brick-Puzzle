@@ -3,52 +3,46 @@ import java.util.Map;
 
 public class Board {
 
-	private int width;
-	private int height;
-	private int[][] gameBoard;
+    private int width;
+    private int height;
+    private int[][] gameBoard;
     private Map<Integer, Piece> boardPieces = new HashMap<Integer, Piece>();
 
-	public Board(int w, int h, int[][] board) {
-		width = w;
-		height = h;
-		gameBoard = board;
-		populatePieces();
-	}
+    public Board(int w, int h, int[][] board) {
+        width = w;
+        height = h;
+        gameBoard = board;
+        populatePieces();
+    }
 
-	public Board(Board b) {
-		this.width = b.width;
-		this.height = b.height;
-		this.gameBoard = b.gameBoard;
-		populatePieces();
-	}
+    // prints out the board
+    public void displayBoard() {
+        System.out.printf("%d,%d,\n", width, height);
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                System.out.printf("%d,", gameBoard[row][column]);
+            }
+            System.out.println();
+        }
+    }
 
-	public void displayBoard() {
-		System.out.printf("%d,%d,\n", width, height);
-		for (int row = 0; row < height; row++) {
-			for (int column = 0; column < width; column++) {
-				System.out.printf("%d,", gameBoard[row][column]);
-			}
-			System.out.println();
-		}
-	}
+    public Board cloneBoard() {
+        int[][] clonedState = new int[height][width];
 
-	public Board cloneBoard() {
-	    int[][] clonedState = new int[height][width];
-	    
-	    //copy board state
-	    for (int row = 0; row < height; row++) {
+        // copy board state
+        for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
                 clonedState[row][column] = gameBoard[row][column];
             }
         }
-	    
-		Board boardClone = new Board(width, height, clonedState);
-		return boardClone;
-	}
 
-	public void populatePieces() {
+        Board boardClone = new Board(width, height, clonedState);
+        return boardClone;
+    }
 
-        // loop through board and create unique pieces
+    public void populatePieces() {
+        boardPieces.clear();
+        // loop through board and create unique piece objects
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
                 int boardValue = gameBoard[row][column];
@@ -68,20 +62,20 @@ public class Board {
             }
         }
     }
-	
-	public int getWidth() {
-		return width;
-	}
 
-	public int getHeight() {
-		return height;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public int[][] getGameBoard() {
-		return gameBoard;
-	}
-	
-	public Map<Integer, Piece> getPieces(){
+    public int getHeight() {
+        return height;
+    }
+
+    public int[][] getGameBoard() {
+        return gameBoard;
+    }
+
+    public Map<Integer, Piece> getPieces() {
         return boardPieces;
     }
 

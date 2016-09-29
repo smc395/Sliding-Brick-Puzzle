@@ -5,7 +5,7 @@ import java.util.Map;
 public class Move {
     
     private ArrayList<Position> selectedMove = new ArrayList<Position>();
-    private Piece movePiece;
+    private Piece movePiece; // piece that will be moved
 
     public Map<Direction, ArrayList<Position>> listAllPieceMoves(Piece piece, Board boardState) {
         boolean moveRight = true, moveLeft = true, moveUp = true, moveDown = true;
@@ -59,7 +59,6 @@ public class Move {
             int pieceRow = positions.get(k).getRow();
             int pieceColumn = positions.get(k).getColumn();
             
-            //System.out.printf("(%d,%d) ",pieceRow,pieceColumn);
             if (moveRight) {
                 Position p = new Position(pieceRow, pieceColumn + 1);
                 possiblePositionsRight.add(p);
