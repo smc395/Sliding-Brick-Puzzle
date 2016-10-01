@@ -8,6 +8,7 @@ public class Move {
     private Piece movePiece; // piece that will be moved
 
     public Map<Direction, ArrayList<Position>> listAllPieceMoves(Piece piece, Board boardState) {
+
         boolean moveRight = true, moveLeft = true, moveUp = true, moveDown = true;
 
         int[][] gameBoard = boardState.getGameBoard();
@@ -101,9 +102,12 @@ public class Move {
         Map<Piece, Map<Direction, ArrayList<Position>>> possibleMoves = new HashMap<Piece, Map<Direction, ArrayList<Position>>>();
         
         for (int i = 0; i < boardState.getPieces().size(); i++) {
-            possibleMoves.put(boardState.getPieces().get(i+2),listAllPieceMoves(boardState.getPieces().get(i+2),boardState));
+            Map<Direction, ArrayList<Position>> pieceMove = listAllPieceMoves(boardState.getPieces().get(i+2),boardState);            
+            if(!pieceMove.isEmpty()){
+                possibleMoves.put(boardState.getPieces().get(i+2), pieceMove);
+            }
         }
-        
+       
         return possibleMoves;
     }
     

@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 
 public class Game {
 
@@ -73,18 +76,21 @@ public class Game {
     public void applyMove(Board board, Move move) {
         int[][] gameBoard = board.getGameBoard();
 
-        // move position of piece to selected direction
-        for (int i = 0; i < move.getSelectedMove().size(); i++) {
-            int pieceRow = move.getSelectedMove().get(i).getRow();
-            int pieceColumn = move.getSelectedMove().get(i).getColumn();
-            gameBoard[pieceRow][pieceColumn] = move.getMovePiece().getPieceNumber();
+        for (int row = 0; row < board.getHeight(); row++) {
+            for (int column = 0; column < board.getWidth(); column++) {
+                Piece p = move.getMovePiece();
+                if(gameBoard[row][column] == p.getPieceNumber()){
+                     gameBoard[row][column] = 0;
+                }
+            }
         }
-        // replace piece positions with zeros
-        for (int j = 0; j < move.getMovePiece().getPostions().size(); j++) {
-            int pieceRow = move.getMovePiece().getPostions().get(j).getRow();
-            int pieceColumn = move.getMovePiece().getPostions().get(j).getColumn();
-            gameBoard[pieceRow][pieceColumn] = 0;
-        }
+
+    for( int i = 0;i<move.getSelectedMove().size();i++){
+        int pieceRow = move.getSelectedMove().get(i).getRow();
+        int pieceColumn = move.getSelectedMove().get(i).getColumn();
+        gameBoard[pieceRow][pieceColumn] = move.getMovePiece().getPieceNumber();
+    }
+        board.populatePieces();
     }
 
     public Board applyMoveCloning(Board board, Move move) {
@@ -105,12 +111,12 @@ public class Game {
     }
 
     public void normalize(Board board) {
-        
+
         int nextIdx = 3;
         for (int row = 0; row < board.getHeight(); row++) {
             for (int column = 0; column < board.getWidth(); column++) {
                 int cellValue = board.getGameBoard()[row][column];
-                if (cellValue ==nextIdx) {
+                if (cellValue == nextIdx) {
                     nextIdx++;
                 } else if (cellValue > nextIdx) {
                     swapIdx(nextIdx, cellValue, board);
@@ -123,20 +129,65 @@ public class Game {
     }
 
     private void swapIdx(int idx1, int idx2, Board board) {
-        
+
         for (int i = 0; i < board.getHeight(); i++) {
             for (int j = 0; j < board.getWidth(); j++) {
-                if (board.getGameBoard()[i][j]==idx1) {
-                    board.getGameBoard()[i][j]=idx2;
-                } else if (board.getGameBoard()[i][j]==idx2) {
-                    board.getGameBoard()[i][j]=idx1;
+                if (board.getGameBoard()[i][j] == idx1) {
+                    board.getGameBoard()[i][j] = idx2;
+                } else if (board.getGameBoard()[i][j] == idx2) {
+                    board.getGameBoard()[i][j] = idx1;
                 }
             }
         }
     }
-    
-    public void randomWalk(Board board, int n){
-        Move move = new Move();
-        move.listAllMoves(board);
+
+    public void randomWalk(Board board, int n) {
+        
+        int count = 0;
+        while (solved != true && count < n) {
+            board.displayBoard();
+            Move move = new Move();
+            // generate all the moves possible on board
+            Map<Piece, Map<Direction, ArrayList<Position>>> allMoves = move.listAllMoves(board);
+
+            // choose a possible move at random
+            Random random = new Random();
+
+            int selected = random.nextInt(allMoves.keySet().size());
+
+            int c = 0;
+            for (Piece p : allMoves.keySet()) {
+                if (c == selected) {
+                    int selectedDirection = random.nextInt(allMoves.get(p).keySet().size());
+                    int g = 0;
+                    for (Direction d : allMoves.get(p).keySet()) {
+                        if (g == selectedDirection) {
+                            ArrayList<Position> m = allMoves.get(p).get(d); 
+                            move.setSelectedMove(m);
+                            move.setMovePiece(p);
+                            System.out.printf("(%d,%s)\n\n", p.getPieceNumber(), d);
+                            
+                        } else {
+                            g++;
+                        }
+                    }
+                    break;
+                } else {
+                    c++;
+                }
+            }
+            // applyMove
+            applyMove(board, move);
+            
+            // normalize resulting game state
+            normalize(board);
+            
+            //check if puzzle solved
+            puzzleCompleteCheck();
+            
+            // increment loop count
+            count++;
+        }
+        board.displayBoard();
     }
 }

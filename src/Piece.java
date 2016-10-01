@@ -36,6 +36,7 @@ public class Piece {
     }
     
     public void printPositions(){
+        System.out.printf("%d - ",pieceNumber);
         for(Position p : positions){
             System.out.printf("(%d,%d) ", p.getRow(),p.getColumn());
         }
