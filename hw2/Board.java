@@ -71,14 +71,14 @@ public class Board {
         return height;
     }
 
-    public void setGameBoard(int[][] newBoard){
+    public void setGameBoard(int[][] newBoard) {
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
                 gameBoard[row][column] = newBoard[row][column];
             }
         }
     }
-    
+
     public int[][] getGameBoard() {
         return gameBoard;
     }

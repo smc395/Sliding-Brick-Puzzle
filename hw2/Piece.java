@@ -19,14 +19,14 @@ public class Piece {
         return positions;
     }
 
-    public void setPieceNumber(int n){
+    public void setPieceNumber(int n) {
         pieceNumber = n;
     }
-    
-    public int getPieceNumber(){
+
+    public int getPieceNumber() {
         return pieceNumber;
     }
-    
+
     public void setMasterPiece() {
         master = true;
     }
@@ -34,11 +34,11 @@ public class Piece {
     public boolean isMasterPiece() {
         return master;
     }
-    
-    public void printPositions(){
-        System.out.printf("%d - ",pieceNumber);
-        for(Position p : positions){
-            System.out.printf("(%d,%d) ", p.getRow(),p.getColumn());
+
+    public void printPositions() {
+        System.out.printf("%d - ", pieceNumber);
+        for (Position p : positions) {
+            System.out.printf("(%d,%d) ", p.getRow(), p.getColumn());
         }
         System.out.println();
     }

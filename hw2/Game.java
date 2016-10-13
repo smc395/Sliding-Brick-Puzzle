@@ -2,12 +2,19 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class Game {
 
     private Board board;
     private boolean solved = false;
+    private int numNodesExplored = 0;
+    private double timeTaken = 0.0;
+    private ArrayList<Move> solutionPath = new ArrayList<Move>();
+    private ArrayList<Board> visitedStates = new ArrayList<Board>();
+    private Queue<Node> q = new LinkedList<Node>();
 
     public void loadGameState(String fileName) throws NumberFormatException, IOException {
 
@@ -56,7 +63,7 @@ public class Game {
         return solved;
     }
 
-    public void puzzleCompleteCheck() {
+    public void puzzleCompleteCheck(Board board) {
         boolean goalSpaceExist = false;
         // loop through each cell in matrix for -1
         for (int row = 0; row < board.getHeight(); row++) {
@@ -68,6 +75,7 @@ public class Game {
         }
         if (goalSpaceExist == false) {
             solved = true;
+            this.board = board;
             System.out.println("Puzzle solved!");
         }
     }
@@ -109,7 +117,7 @@ public class Game {
             }
         }
         board.populatePieces();
-        setBoard(board);
+        // setBoard(board);
     }
 
     private void swapIdx(int idx1, int idx2, Board board) {
@@ -136,11 +144,11 @@ public class Game {
             // choose a possible move at random
             Random random = new Random();
             int selected = random.nextInt(allMoves.size());
-            
+
             // get selected random move
             Move move = allMoves.get(selected);
             move.displayMove();
-            
+
             // applyMove
             applyMove(board, move);
 
@@ -148,7 +156,7 @@ public class Game {
             normalize(board);
 
             // check if puzzle solved
-            puzzleCompleteCheck();
+            puzzleCompleteCheck(this.board);
 
             // increment loop count
             count++;
@@ -203,7 +211,7 @@ public class Game {
 
         ArrayList<Move> moves = new ArrayList<Move>(4);
 
-        //TODO fix swap logic of numbers and zeros
+        // TODO fix swap logic of numbers and zeros
         // create Move objects for all the moves the piece can make
         if (moveRight) {
             int[][] b = board.cloneBoard().getGameBoard();
@@ -211,7 +219,7 @@ public class Game {
                 int pieceRow = positions.get(k).getRow();
                 int pieceColumn = positions.get(k).getColumn();
                 b[pieceRow][pieceColumn + 1] = piece.getPieceNumber();
-                if(k == 0){
+                if (k == 0) {
                     b[pieceRow][pieceColumn] = 0;
                 }
             }
@@ -276,7 +284,109 @@ public class Game {
         return allMoves;
     }
 
-    public void breadthFirst(Board board) {
+    public void bfs() {
 
+        double startTime = System.currentTimeMillis();
+
+        // create root node
+        Node rootNode = new Node(board);
+        q.add(rootNode);
+
+        Node currentNode = null;
+        while (!solved) {
+
+            // dequeue Node
+            currentNode = q.remove();
+
+            // add node to list of all visited node
+            visitedStates.add(currentNode.getBoard());
+
+            bfsearch(currentNode);
+        }
+
+        double endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        solutionPath = currentNode.getHistory();
+
+        System.out.println("Number of nodes explored: " + numNodesExplored);
+        System.out.println("Length of solution: " + currentNode.getHistory().size());
+        System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
+        for (Move m : currentNode.getHistory()) {
+            m.displayMove();
+        }
+
+        this.board.displayBoard();
     }
-}
+
+    private void bfsearch(Node n) {
+
+        normalize(n.getBoard());
+
+        // check if state is goal state
+        puzzleCompleteCheck(n.getBoard());
+
+        if (solved == false) {
+
+            // get board and list all possible moves
+            ArrayList<Move> availableStates = listAllMoves(n.getBoard());
+
+            // for each possible move, determine if they were previous states
+            // if so add to the queue of nodes next to explore, else do not add
+            // to the queue
+            int visitedSize = visitedStates.size();
+            for (Move move : availableStates) {
+                Board mBoard = move.getMoveBoard();
+
+                normalize(mBoard);
+
+                // boolean flag before looping through each visited state to see
+                // if it
+                // is a previous state
+
+                boolean sameState = false;
+
+                // check if the move would bring us back to a state we've been
+                // in before
+                for (int i = 0; i < visitedSize; i++) {
+
+                    Board visitedState = visitedStates.get(i);
+
+                    normalize(visitedState);
+                    boolean inPrevState = identicalStates(mBoard, visitedState);
+
+                    // if not, then add the node to the queue to expand
+                    if (inPrevState == true) {
+                        sameState = true;
+                        break;
+                    }
+                }
+                if (!sameState) {
+                    numNodesExplored++;
+                    Board newBoard = applyMoveCloning(n.getBoard(), move);
+                    visitedStates.add(newBoard);
+                    Node node = new Node(newBoard);
+
+                    // add to the history of the node the move that took it to
+                    // that node
+                    node.setHistory(n.getHistory());
+                    node.addToHistory(move);
+                    q.add(node);
+                }
+            }
+        }
+    }
+
+    public double getTimeTaken() {
+        return timeTaken;
+    }
+
+    public int getNumNodesExplored() {
+        return numNodesExplored;
+    }
+
+    public ArrayList<Move> getSolutionPath() {
+        return solutionPath;
+    }
+}// end of Game class
