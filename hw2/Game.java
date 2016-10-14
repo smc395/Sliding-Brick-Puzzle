@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Stack;
 
 public class Game {
 
@@ -89,7 +88,6 @@ public class Game {
         }
         if (goalSpaceExist == false) {
             solved = true;
-            this.board = board;
             System.out.println("Puzzle solved!");
         }
     }
@@ -299,7 +297,10 @@ public class Game {
     }
 
     public void bfs() {
-
+        solved = false;
+        visitedStates.clear();
+        numNodesExplored = 0;
+        
         double startTime = System.currentTimeMillis();
 
         // create root node
@@ -387,6 +388,10 @@ public class Game {
     }
 
     public void dfs(){
+        solved = false;
+        visitedStates.clear();
+        numNodesExplored = 0;
+
         double startTime = System.currentTimeMillis();
 
         // create root node
@@ -417,7 +422,6 @@ public class Game {
         
         // if goal state, set n to goalNode and return
         if(solved == true){
-            setBoard(n.getBoard());
             goalNode = n;
             return;
         } else {
@@ -462,7 +466,95 @@ public class Game {
                 }
             }
         }
-        
     }
 
+    public void ids(){
+        
+        solved = false;
+        visitedStates.clear();
+        
+        double startTime = System.currentTimeMillis();
+        
+        // create root node
+        Node rootNode = new Node(board);
+        
+        // add board to visited states
+        visitedStates.add(rootNode.getBoard());
+        
+        for(int depth = 0; depth < 1000; depth++){
+            if(!solved){
+                visitedStates.clear();
+                numNodesExplored = 0;
+                idsearch(rootNode, depth);
+            } else {
+                break;
+            }
+        }
+        
+        double endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        System.out.println("Number of nodes explored: " + numNodesExplored);
+        System.out.println("Length of solution: " + goalNode.getHistory().size());
+        System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
+        for (Move m : goalNode.getHistory()) {
+            m.displayMove();
+        }
+
+        this.board.displayBoard();
+    }
+    
+    private void idsearch(Node n, int depth){
+        puzzleCompleteCheck(n.getBoard());
+        
+        if (solved) {
+            goalNode = n;
+            return;
+        } else if(depth == 0){
+            return;
+        } else {
+            // list all possible moves
+            ArrayList<Move> availableStates = listAllMoves(n.getBoard());
+            int visitedSize = visitedStates.size();
+           
+            // do a depth first search on each on
+            for (Move move : availableStates) {
+                if(solved == false){
+                    boolean sameState = false;
+                    Board mBoard = move.getMoveBoard();
+                    for (int i = 0; i < visitedSize; i++) {
+    
+                        Board visitedState = visitedStates.get(i);
+                        boolean inPrevState = identicalStates(mBoard, visitedState);
+    
+                        if (inPrevState == true) {
+                            sameState = true;
+                            break;
+                        }
+                    }
+                    if(sameState){
+                        continue;
+                    }
+                    else {
+                        numNodesExplored++;
+                        
+                        // Create node with move applied to its board
+                        Board newBoard = applyMoveCloning(n.getBoard(), move);
+                        Node node = new Node(newBoard);
+                        
+                        // add board to visited states
+                        visitedStates.add(newBoard);
+                        
+                        // add to the history of the node the move that took it to that node
+                        node.setHistory(n.getHistory());
+                        node.addToHistory(move);
+                        idsearch(node, depth - 1);
+                    }
+                } else {
+                    return;
+                }
+            }
+        }
+    }
 }// end of Game class
