@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Stack;
 
 public class Game {
 
@@ -14,7 +15,8 @@ public class Game {
     private double timeTaken = 0.0;
     private ArrayList<Move> solutionPath = new ArrayList<Move>();
     private ArrayList<Board> visitedStates = new ArrayList<Board>();
-    private Queue<Node> q = new LinkedList<Node>();
+    private Queue<Node> queue = new LinkedList<Node>();
+    private Node goalNode;
 
     public void loadGameState(String fileName) throws NumberFormatException, IOException {
 
@@ -59,6 +61,18 @@ public class Game {
         return board;
     }
 
+    public double getTimeTaken() {
+        return timeTaken;
+    }
+
+    public int getNumNodesExplored() {
+        return numNodesExplored;
+    }
+
+    public ArrayList<Move> getSolutionPath() {
+        return solutionPath;
+    }
+    
     public boolean getPuzzleSolved() {
         return solved;
     }
@@ -290,13 +304,15 @@ public class Game {
 
         // create root node
         Node rootNode = new Node(board);
-        q.add(rootNode);
+        queue.add(rootNode);
 
         Node currentNode = null;
+        
+        // do breadth first search
         while (!solved) {
 
             // dequeue Node
-            currentNode = q.remove();
+            currentNode = queue.remove();
 
             // add node to list of all visited node
             visitedStates.add(currentNode.getBoard());
@@ -322,8 +338,6 @@ public class Game {
 
     private void bfsearch(Node n) {
 
-        normalize(n.getBoard());
-
         // check if state is goal state
         puzzleCompleteCheck(n.getBoard());
 
@@ -332,28 +346,23 @@ public class Game {
             // get board and list all possible moves
             ArrayList<Move> availableStates = listAllMoves(n.getBoard());
 
-            // for each possible move, determine if they were previous states
-            // if so add to the queue of nodes next to explore, else do not add
-            // to the queue
+            /* for each possible move, determine if they were previous states
+             if so add to the queue of nodes next to explore, else do not add
+             to the queue */
             int visitedSize = visitedStates.size();
             for (Move move : availableStates) {
                 Board mBoard = move.getMoveBoard();
 
-                normalize(mBoard);
-
-                // boolean flag before looping through each visited state to see
-                // if it
-                // is a previous state
+                /* boolean flag before looping through each visited state to see
+                   if it is a previous state */
 
                 boolean sameState = false;
 
-                // check if the move would bring us back to a state we've been
-                // in before
+                // check if the move would bring us back to a state we've been in before
                 for (int i = 0; i < visitedSize; i++) {
 
                     Board visitedState = visitedStates.get(i);
 
-                    normalize(visitedState);
                     boolean inPrevState = identicalStates(mBoard, visitedState);
 
                     // if not, then add the node to the queue to expand
@@ -368,25 +377,92 @@ public class Game {
                     visitedStates.add(newBoard);
                     Node node = new Node(newBoard);
 
-                    // add to the history of the node the move that took it to
-                    // that node
+                    // add to the history of the node the move that took it to that node
                     node.setHistory(n.getHistory());
                     node.addToHistory(move);
-                    q.add(node);
+                    queue.add(node);
                 }
             }
         }
     }
 
-    public double getTimeTaken() {
-        return timeTaken;
+    public void dfs(){
+        double startTime = System.currentTimeMillis();
+
+        // create root node
+        Node rootNode = new Node(board);
+
+        // do depth first search
+        while (!solved) {
+            dfsearch(rootNode);
+        }
+
+        double endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        System.out.println("Number of nodes explored: " + numNodesExplored);
+        System.out.println("Length of solution: " + goalNode.getHistory().size());
+        System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
+        for (Move m : goalNode.getHistory()) {
+            m.displayMove();
+        }
+
+        this.board.displayBoard();
+    }
+    
+    private void dfsearch(Node n){
+        // check if node is goal state
+        puzzleCompleteCheck(n.getBoard());
+        
+        // if goal state, set n to goalNode and return
+        if(solved == true){
+            setBoard(n.getBoard());
+            goalNode = n;
+            return;
+        } else {
+            // add board to visited states
+            visitedStates.add(n.getBoard());
+            
+            ArrayList<Move> availableStates = listAllMoves(n.getBoard());
+            int visitedSize = visitedStates.size();
+            
+            // for each move and game isn't solved, check if move is a visitedState
+            for (Move move : availableStates) {
+                if(solved == false){
+                    boolean sameState = false;
+                    Board mBoard = move.getMoveBoard();
+                    for (int i = 0; i < visitedSize; i++) {
+    
+                        Board visitedState = visitedStates.get(i);
+                        boolean inPrevState = identicalStates(mBoard, visitedState);
+    
+                        if (inPrevState == true) {
+                            sameState = true;
+                            break;
+                        }
+                    }
+                    if(sameState){
+                        continue;
+                    }
+                    else {
+                        numNodesExplored++;
+                        
+                        // Create node with move applied to its board
+                        Board newBoard = applyMoveCloning(n.getBoard(), move);
+                        Node node = new Node(newBoard);
+                        
+                        // add to the history of the node the move that took it to that node
+                        node.setHistory(n.getHistory());
+                        node.addToHistory(move);
+                        dfsearch(node);
+                    }
+                } else {
+                    return;
+                }
+            }
+        }
+        
     }
 
-    public int getNumNodesExplored() {
-        return numNodesExplored;
-    }
-
-    public ArrayList<Move> getSolutionPath() {
-        return solutionPath;
-    }
 }// end of Game class
