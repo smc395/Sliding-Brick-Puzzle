@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ public class Board {
     private int height;
     private int[][] gameBoard;
     private Map<Integer, Piece> boardPieces = new HashMap<Integer, Piece>();
+    private ArrayList<Position> goalLocation = new ArrayList<Position>();
 
     public Board(int w, int h, int[][] board) {
         width = w;
@@ -58,6 +60,9 @@ public class Board {
                         }
                         boardPieces.put(boardValue, piece);
                     }
+                } else if (boardValue == -1) {
+                    Position goalPosition = new Position(row, column);
+                    goalLocation.add(goalPosition);
                 }
             }
         }
@@ -85,6 +90,10 @@ public class Board {
 
     public Map<Integer, Piece> getPieces() {
         return boardPieces;
+    }
+    
+    public ArrayList<Position> getGoalLocation(){
+        return goalLocation;
     }
 
 }

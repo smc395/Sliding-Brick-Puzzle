@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
@@ -16,7 +17,8 @@ public class Game {
     private ArrayList<Board> visitedStates = new ArrayList<Board>();
     private Queue<Node> queue = new LinkedList<Node>();
     private Node goalNode;
-
+    private PriorityQueue<Node> pQueue = new PriorityQueue<Node>(1, new FComparator());
+    
     public void loadGameState(String fileName) throws NumberFormatException, IOException {
 
         // read a file from state folder
@@ -245,6 +247,7 @@ public class Game {
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.RIGHT);
+            m.calculateManhattan();
             moves.add(m);
         }
         if (moveLeft) {
@@ -266,6 +269,7 @@ public class Game {
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.LEFT);
+            m.calculateManhattan();
             moves.add(m);
         }
         if (moveUp) {
@@ -287,6 +291,7 @@ public class Game {
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.UP);
+            m.calculateManhattan();
             moves.add(m);
         }
         if (moveDown) {
@@ -308,6 +313,7 @@ public class Game {
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.DOWN);
+            m.calculateManhattan();
             moves.add(m);
         }
 
@@ -365,7 +371,7 @@ public class Game {
             m.displayMove();
         }
 
-        this.board.displayBoard();
+        currentNode.getBoard().displayBoard();
     }
 
     private void bfsearch(Node n) {
@@ -586,6 +592,117 @@ public class Game {
                     }
                 } else {
                     return;
+                }
+            }
+        }
+    }
+
+    public void as(){
+        solved = false;
+        visitedStates.clear();
+        numNodesExplored = 0;
+
+        double startTime = System.currentTimeMillis();
+
+        // create root node
+        normalize(board);
+        Node rootNode = new Node(board);
+        pQueue.add(rootNode);
+        
+        // add board to visited states
+        visitedStates.add(rootNode.getBoard());
+
+        Node currentNode = null;
+        while(!solved){
+            currentNode = pQueue.poll();
+            numNodesExplored++;
+            aStarSearch(currentNode);
+        }
+
+        double endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        System.out.println("Number of nodes explored: " + numNodesExplored);
+        System.out.println("Length of solution: " + currentNode.getHistory().size());
+        System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
+        for (Move m : currentNode.getHistory()) {
+            m.displayMove();
+        }
+
+        currentNode.getBoard().displayBoard();
+    }
+    
+    public void aStarSearch(Node n){
+        normalize(n.getBoard());
+        
+        // check if state is goal state
+        puzzleCompleteCheck(n.getBoard());
+
+        if (solved == false) {
+
+            // get board and list all possible moves
+            ArrayList<Move> availableStates = listAllMoves(n.getBoard());
+
+            /*next Node
+            Move selectedNode;
+            
+            //loop through the moves and calculate f(n) for each move and place moves in order of smallest f to largest
+            int smallest=1000;
+            for (Move move : availableStates){
+                move.setCost(n.getHistory().size());
+                int f = move.calculateF();
+                if(f < smallest){
+                    selectedNode = move;
+                    smallest = f;
+                }
+            }
+            
+            /*
+             * for each possible move, determine if they were previous states if
+             * so add to the queue of nodes next to explore, else do not add to
+             * the queue
+             */
+            int visitedSize = visitedStates.size();
+            for (Move move : availableStates) {
+                Board mBoard = move.getMoveBoard();
+                normalize(mBoard);
+                move.setCost(n.getHistory().size()+1);
+
+                /*
+                 * boolean flag before looping through each visited state to see
+                 * if it is a previous state
+                 */
+
+                boolean sameState = false;
+
+                // check if the move would bring us back to a state we've been in before
+                for (int i = 0; i < visitedSize; i++) {
+
+                    Board visitedState = visitedStates.get(i);
+                    normalize(visitedState);
+
+                    boolean inPrevState = identicalStates(mBoard, visitedState);
+
+                    // if not, then add the node to the queue to expand
+                    if (inPrevState == true) {
+                        sameState = true;
+                        break;
+                    }
+                }
+                if (!sameState) {
+                    
+
+                    Board newBoard = applyMoveCloning(n.getBoard(), move);
+                    normalize(newBoard);
+                    visitedStates.add(newBoard);
+                    Node node = new Node(newBoard);
+                    node.setfCost(move.calculateF());
+                    
+                    // add to the history of the node the move that took it to that node
+                    node.setHistory(n.getHistory());
+                    node.addToHistory(move);
+                    pQueue.add(node);
                 }
             }
         }

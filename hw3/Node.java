@@ -4,6 +4,7 @@ public class Node {
 
     private Board nodeBoard;
     private ArrayList<Move> history = new ArrayList<Move>();
+    private int fCost = 0;
 
     public Node(Board board){
         nodeBoard = board;
@@ -29,5 +30,13 @@ public class Node {
     
     public Board getBoard(){
         return nodeBoard;
+    }
+    
+    public void setfCost(int cost){
+        fCost = cost;
+    }
+    
+    public int getfCost(){
+        return fCost;
     }
 }

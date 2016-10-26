@@ -54,8 +54,8 @@ public class HW3 {
                 e.printStackTrace();
             }
             // g.randomWalk(g.getBoard(), 100);*/
-            System.out.println("Breadth First Search:");
-            g.bfs();
+            /*System.out.println("Breadth First Search:");
+            
             System.out.println();
             
             System.out.println("Depth First Search:");
@@ -64,7 +64,9 @@ public class HW3 {
             
             System.out.println("Iterative Deepening Search:");
             g.ids();
-            System.out.println();
+            System.out.println();*/
+            //g.bfs();
+            g.as();
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
