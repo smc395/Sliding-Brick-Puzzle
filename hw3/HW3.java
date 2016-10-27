@@ -15,8 +15,10 @@ public class HW3 {
             g.loadGameState(args[0]);
             System.out.println("Initial board state");
             g.getBoard().displayBoard();
-            /*try {
-                PrintWriter writer = new PrintWriter("dfs-output-part2.txt");
+            try {
+                PrintWriter writer = new PrintWriter("bricks-level5-output-part2.txt");
+                writer.println("******** BRICKS-LEVEL 5 ********");
+                writer.println();
                 writer.println("Initial board state");
                 writer.printf("%d,%d,", g.getBoard().getWidth(), g.getBoard().getHeight());
                 writer.println();
@@ -26,24 +28,27 @@ public class HW3 {
                     }
                     writer.println();
                 }
+                writer.println();
+                // do a* search
+                g.aStar();
 
-                // do breadth first search
-                g.dfs();
-
+                writer.println("********** A* WITH MANHATTAN **********");
+                writer.println();
                 writer.println("Number of nodes explored: " + g.getNumNodesExplored());
-                writer.println("Length of solution: " + g.getGoadNode().getHistory().size());
+                writer.println("Length of solution: " + g.getGoalNode().getHistory().size());
                 writer.printf("Time taken to complete: %.0f ms", g.getTimeTaken());
                 writer.println();
-                for (Move m : g.getGoadNode().getHistory()) {
+                for (Move m : g.getGoalNode().getHistory()) {
                     writer.printf("(%d,%s)", m.getMovePiece().getPieceNumber(), m.getSelectedMove());
                     writer.println();
                 }
 
+                // print solution board
                 writer.printf("%d,%d,", g.getBoard().getWidth(), g.getBoard().getHeight());
                 writer.println();
                 for (int row = 0; row < g.getBoard().getHeight(); row++) {
                     for (int column = 0; column < g.getBoard().getWidth(); column++) {
-                        writer.printf("%d,", g.getBoard().getGameBoard()[row][column]);
+                        writer.printf("%d,", g.getGoalNode().getBoard().getGameBoard()[row][column]);
                     }
                     writer.println();
                 }
@@ -66,7 +71,7 @@ public class HW3 {
             g.ids();
             System.out.println();*/
             //g.bfs();
-            g.as();
+            //g.aStar();
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {

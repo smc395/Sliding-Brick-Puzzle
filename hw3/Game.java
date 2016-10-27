@@ -78,6 +78,10 @@ public class Game {
         return solved;
     }
 
+    public Node getGoalNode(){
+        return goalNode;
+    }
+    
     public void puzzleCompleteCheck(Board board) {
         boolean goalSpaceExist = false;
         // loop through each cell in matrix for -1
@@ -131,7 +135,6 @@ public class Game {
             }
         }
         board.populatePieces();
-        // setBoard(board);
     }
 
     private void swapIdx(int idx1, int idx2, Board board) {
@@ -244,6 +247,7 @@ public class Game {
                 }
                 
             }
+            
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.RIGHT);
@@ -597,7 +601,7 @@ public class Game {
         }
     }
 
-    public void as(){
+    public void aStar(){
         solved = false;
         visitedStates.clear();
         numNodesExplored = 0;
@@ -605,7 +609,7 @@ public class Game {
         double startTime = System.currentTimeMillis();
 
         // create root node
-        normalize(board);
+        //normalize(board);
         Node rootNode = new Node(board);
         pQueue.add(rootNode);
         
@@ -623,6 +627,8 @@ public class Game {
 
         timeTaken = endTime - startTime;
 
+        goalNode = currentNode;
+        
         System.out.println("Number of nodes explored: " + numNodesExplored);
         System.out.println("Length of solution: " + currentNode.getHistory().size());
         System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
@@ -643,20 +649,6 @@ public class Game {
 
             // get board and list all possible moves
             ArrayList<Move> availableStates = listAllMoves(n.getBoard());
-
-            /*next Node
-            Move selectedNode;
-            
-            //loop through the moves and calculate f(n) for each move and place moves in order of smallest f to largest
-            int smallest=1000;
-            for (Move move : availableStates){
-                move.setCost(n.getHistory().size());
-                int f = move.calculateF();
-                if(f < smallest){
-                    selectedNode = move;
-                    smallest = f;
-                }
-            }
             
             /*
              * for each possible move, determine if they were previous states if
@@ -665,8 +657,8 @@ public class Game {
              */
             int visitedSize = visitedStates.size();
             for (Move move : availableStates) {
+                normalize(move.getMoveBoard());
                 Board mBoard = move.getMoveBoard();
-                normalize(mBoard);
                 move.setCost(n.getHistory().size()+1);
 
                 /*
@@ -680,7 +672,7 @@ public class Game {
                 for (int i = 0; i < visitedSize; i++) {
 
                     Board visitedState = visitedStates.get(i);
-                    normalize(visitedState);
+                    //normalize(visitedState);
 
                     boolean inPrevState = identicalStates(mBoard, visitedState);
 
@@ -691,10 +683,9 @@ public class Game {
                     }
                 }
                 if (!sameState) {
-                    
 
                     Board newBoard = applyMoveCloning(n.getBoard(), move);
-                    normalize(newBoard);
+                    //normalize(newBoard);
                     visitedStates.add(newBoard);
                     Node node = new Node(newBoard);
                     node.setfCost(move.calculateF());
