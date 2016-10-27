@@ -16,7 +16,7 @@ public class HW2 {
             System.out.println("Initial board state");
             g.getBoard().displayBoard();
             /*try {
-                PrintWriter writer = new PrintWriter("dfs-level0-output-part2.txt");
+                PrintWriter writer = new PrintWriter("dfs-output-part2.txt");
                 writer.println("Initial board state");
                 writer.printf("%d,%d,", g.getBoard().getWidth(), g.getBoard().getHeight());
                 writer.println();
@@ -28,13 +28,13 @@ public class HW2 {
                 }
 
                 // do breadth first search
-                g.bfs();
+                g.dfs();
 
                 writer.println("Number of nodes explored: " + g.getNumNodesExplored());
-                writer.println("Length of solution: " + g.getSolutionPath().size());
+                writer.println("Length of solution: " + g.getGoadNode().getHistory().size());
                 writer.printf("Time taken to complete: %.0f ms", g.getTimeTaken());
                 writer.println();
-                for (Move m : g.getSolutionPath()) {
+                for (Move m : g.getGoadNode().getHistory()) {
                     writer.printf("(%d,%s)", m.getMovePiece().getPieceNumber(), m.getSelectedMove());
                     writer.println();
                 }
@@ -52,8 +52,8 @@ public class HW2 {
                 writer.close();
             } catch (Exception e) {
                 e.printStackTrace();
-            }*/
-            // g.randomWalk(g.getBoard(), 100);
+            }
+            // g.randomWalk(g.getBoard(), 100);*/
             System.out.println("Breadth First Search:");
             g.bfs();
             System.out.println();

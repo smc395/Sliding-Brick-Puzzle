@@ -182,13 +182,13 @@ public class Game {
         int[][] gameBoard = board.getGameBoard();
 
         // first get piece current positions
-        ArrayList<Position> positions = piece.getPostions();
-        int positionSize = positions.size();
+        ArrayList<Position> piecePositions = piece.getPostions();
+        int positionSize = piecePositions.size();
 
         // Check what direction piece can move
         for (int j = 0; j < positionSize; j++) {
-            int pieceRow = positions.get(j).getRow();
-            int pieceColumn = positions.get(j).getColumn();
+            int pieceRow = piecePositions.get(j).getRow();
+            int pieceColumn = piecePositions.get(j).getColumn();
 
             /*
              * check right if piece is the same piece, another piece, a wall and
@@ -223,18 +223,26 @@ public class Game {
 
         ArrayList<Move> moves = new ArrayList<Move>(4);
 
-        // TODO fix swap logic of numbers and zeros
         // create Move objects for all the moves the piece can make
         if (moveRight) {
             int[][] b = board.cloneBoard().getGameBoard();
-            for (int k = 0; k < positionSize; k++) {
-                int pieceRow = positions.get(k).getRow();
-                int pieceColumn = positions.get(k).getColumn();
-                b[pieceRow][pieceColumn + 1] = piece.getPieceNumber();
-                if (k == 0) {
+            for (int k = positionSize-1; k >= 0; k--) {
+                int pieceRow = piecePositions.get(k).getRow();
+                int pieceColumn = piecePositions.get(k).getColumn();
+                
+                // if there is an empty space then start from end of list and swap
+                if(b[pieceRow][pieceColumn + 1] == 0){
+                    int temp = b[pieceRow][pieceColumn];
+                    b[pieceRow][pieceColumn] = b[pieceRow][pieceColumn + 1];
+                    b[pieceRow][pieceColumn + 1] = temp;
+                } else{
+                    // replace piece and don't swap 
+                    b[pieceRow][pieceColumn + 1] = piece.getPieceNumber();
                     b[pieceRow][pieceColumn] = 0;
                 }
+                
             }
+            
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.RIGHT);
@@ -243,10 +251,18 @@ public class Game {
         if (moveLeft) {
             int[][] b = board.cloneBoard().getGameBoard();
             for (int k = 0; k < positionSize; k++) {
-                int pieceRow = positions.get(k).getRow();
-                int pieceColumn = positions.get(k).getColumn();
-                b[pieceRow][pieceColumn - 1] = piece.getPieceNumber();
-                b[pieceRow][pieceColumn] = 0;
+                int pieceRow = piecePositions.get(k).getRow();
+                int pieceColumn = piecePositions.get(k).getColumn();
+                // if there is an empty space then start from beginning of list and swap
+                if(b[pieceRow][pieceColumn - 1] == 0){
+                    int temp = b[pieceRow][pieceColumn];
+                    b[pieceRow][pieceColumn] = b[pieceRow][pieceColumn - 1];
+                    b[pieceRow][pieceColumn - 1] = temp;
+                } else{
+                    // replace piece and don't swap 
+                    b[pieceRow][pieceColumn - 1] = piece.getPieceNumber();
+                    b[pieceRow][pieceColumn] = 0;
+                }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
@@ -256,10 +272,18 @@ public class Game {
         if (moveUp) {
             int[][] b = board.cloneBoard().getGameBoard();
             for (int k = 0; k < positionSize; k++) {
-                int pieceRow = positions.get(k).getRow();
-                int pieceColumn = positions.get(k).getColumn();
-                b[pieceRow - 1][pieceColumn] = piece.getPieceNumber();
-                b[pieceRow][pieceColumn] = 0;
+                int pieceRow = piecePositions.get(k).getRow();
+                int pieceColumn = piecePositions.get(k).getColumn();
+                // if there is an empty space then start from beginning of list and swap
+                if(b[pieceRow - 1][pieceColumn] == 0){
+                    int temp = b[pieceRow][pieceColumn];
+                    b[pieceRow][pieceColumn] = b[pieceRow - 1][pieceColumn];
+                    b[pieceRow - 1][pieceColumn] = temp;
+                } else{
+                    // replace piece and don't swap 
+                    b[pieceRow - 1][pieceColumn] = piece.getPieceNumber();
+                    b[pieceRow][pieceColumn] = 0;
+                }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
@@ -268,11 +292,19 @@ public class Game {
         }
         if (moveDown) {
             int[][] b = board.cloneBoard().getGameBoard();
-            for (int k = 0; k < positionSize; k++) {
-                int pieceRow = positions.get(k).getRow();
-                int pieceColumn = positions.get(k).getColumn();
-                b[pieceRow + 1][pieceColumn] = piece.getPieceNumber();
-                b[pieceRow][pieceColumn] = 0;
+            for (int k = positionSize-1; k >=0; k--) {
+                int pieceRow = piecePositions.get(k).getRow();
+                int pieceColumn = piecePositions.get(k).getColumn();
+                // if there is an empty space then start from end of list and swap
+                if(b[pieceRow + 1][pieceColumn] == 0){
+                    int temp = b[pieceRow][pieceColumn];
+                    b[pieceRow][pieceColumn] = b[pieceRow + 1][pieceColumn];
+                    b[pieceRow + 1][pieceColumn] = temp;
+                } else{
+                    // replace piece and don't swap 
+                    b[pieceRow + 1][pieceColumn] = piece.getPieceNumber();
+                    b[pieceRow][pieceColumn] = 0;
+                }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
             m.setMovePiece(piece);
@@ -339,6 +371,8 @@ public class Game {
 
     private void bfsearch(Node n) {
 
+        normalize(n.getBoard());
+        
         // check if state is goal state
         puzzleCompleteCheck(n.getBoard());
 
@@ -352,6 +386,7 @@ public class Game {
              to the queue */
             int visitedSize = visitedStates.size();
             for (Move move : availableStates) {
+                normalize(move.getMoveBoard());
                 Board mBoard = move.getMoveBoard();
 
                 /* boolean flag before looping through each visited state to see
@@ -417,6 +452,8 @@ public class Game {
     }
     
     private void dfsearch(Node n){
+        normalize(n.getBoard());
+        
         // check if node is goal state
         puzzleCompleteCheck(n.getBoard());
         
@@ -435,6 +472,7 @@ public class Game {
             for (Move move : availableStates) {
                 if(solved == false){
                     boolean sameState = false;
+                    normalize(move.getMoveBoard());
                     Board mBoard = move.getMoveBoard();
                     for (int i = 0; i < visitedSize; i++) {
     
@@ -506,6 +544,8 @@ public class Game {
     }
     
     private void idsearch(Node n, int depth){
+        normalize(n.getBoard());
+        
         puzzleCompleteCheck(n.getBoard());
         
         if (solved) {
@@ -522,6 +562,7 @@ public class Game {
             for (Move move : availableStates) {
                 if(solved == false){
                     boolean sameState = false;
+                    normalize(move.getMoveBoard());
                     Board mBoard = move.getMoveBoard();
                     for (int i = 0; i < visitedSize; i++) {
     
