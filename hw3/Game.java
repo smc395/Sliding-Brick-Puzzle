@@ -249,6 +249,8 @@ public class Game {
             }
             
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.RIGHT);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.RIGHT);
             m.calculateManhattan();
@@ -271,6 +273,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.LEFT);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.LEFT);
             m.calculateManhattan();
@@ -293,6 +297,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.UP);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.UP);
             m.calculateManhattan();
@@ -315,6 +321,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.DOWN);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.DOWN);
             m.calculateManhattan();
@@ -619,6 +627,8 @@ public class Game {
         Node currentNode = null;
         while(!solved){
             currentNode = pQueue.poll();
+            //System.out.println("Current Node Board:");
+            //currentNode.getBoard().displayBoard();
             numNodesExplored++;
             aStarSearch(currentNode);
         }
