@@ -1,6 +1,11 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Main function of game 
+ * @author Sung Yan Chao
+ *
+ */
 public class HW3 {
 
     public static void main(String[] args) {
@@ -15,9 +20,9 @@ public class HW3 {
             g.loadGameState(args[0]);
             System.out.println("Initial board state");
             g.getBoard().displayBoard();
-            try {
-                PrintWriter writer = new PrintWriter("bricks-level5-output-part2.txt");
-                writer.println("******** BRICKS-LEVEL 5 ********");
+            /*try {
+                PrintWriter writer = new PrintWriter("bricks-level7-output-part2.txt");
+                writer.println("******** BRICKS-LEVEL 7 ********");
                 writer.println();
                 writer.println("Initial board state");
                 writer.printf("%d,%d,", g.getBoard().getWidth(), g.getBoard().getHeight());
@@ -30,7 +35,7 @@ public class HW3 {
                 }
                 writer.println();
                 // do a* search
-                g.aStar();
+                g.aStarM();
 
                 writer.println("********** A* WITH MANHATTAN **********");
                 writer.println();
@@ -57,21 +62,8 @@ public class HW3 {
                 writer.close();
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            // g.randomWalk(g.getBoard(), 100);*/
-            /*System.out.println("Breadth First Search:");
-            
-            System.out.println();
-            
-            System.out.println("Depth First Search:");
-            g.dfs();
-            System.out.println();
-            
-            System.out.println("Iterative Deepening Search:");
-            g.ids();
-            System.out.println();*/
-            //g.bfs();
-            //g.aStar();
+            }*/
+            g.aStarM();
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
