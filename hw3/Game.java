@@ -78,6 +78,10 @@ public class Game {
         return solved;
     }
 
+    public Node getGoalNode(){
+        return goalNode;
+    }
+    
     public void puzzleCompleteCheck(Board board) {
         boolean goalSpaceExist = false;
         // loop through each cell in matrix for -1
@@ -244,7 +248,10 @@ public class Game {
                 }
                 
             }
+            
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.RIGHT);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.RIGHT);
             m.calculateManhattan();
@@ -267,6 +274,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.LEFT);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.LEFT);
             m.calculateManhattan();
@@ -289,6 +298,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.UP);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.UP);
             m.calculateManhattan();
@@ -311,6 +322,8 @@ public class Game {
                 }
             }
             Move m = new Move(board.getWidth(), board.getHeight(), b);
+            //System.out.println("Board after moving " + piece.getPieceNumber() + " " + Direction.DOWN);;
+            //m.getMoveBoard().displayBoard();
             m.setMovePiece(piece);
             m.setSelectedMove(Direction.DOWN);
             m.calculateManhattan();
@@ -597,7 +610,7 @@ public class Game {
         }
     }
 
-    public void as(){
+    public void aStar(){
         solved = false;
         visitedStates.clear();
         numNodesExplored = 0;
@@ -605,7 +618,7 @@ public class Game {
         double startTime = System.currentTimeMillis();
 
         // create root node
-        normalize(board);
+        //normalize(board);
         Node rootNode = new Node(board);
         pQueue.add(rootNode);
         
@@ -615,6 +628,8 @@ public class Game {
         Node currentNode = null;
         while(!solved){
             currentNode = pQueue.poll();
+            //System.out.println("Current Node Board:");
+            //currentNode.getBoard().displayBoard();
             numNodesExplored++;
             aStarSearch(currentNode);
         }
@@ -623,6 +638,8 @@ public class Game {
 
         timeTaken = endTime - startTime;
 
+        goalNode = currentNode;
+        
         System.out.println("Number of nodes explored: " + numNodesExplored);
         System.out.println("Length of solution: " + currentNode.getHistory().size());
         System.out.printf("Time taken to complete: %.0f ms\n", timeTaken);
@@ -665,8 +682,8 @@ public class Game {
              */
             int visitedSize = visitedStates.size();
             for (Move move : availableStates) {
+                normalize(move.getMoveBoard());
                 Board mBoard = move.getMoveBoard();
-                normalize(mBoard);
                 move.setCost(n.getHistory().size()+1);
 
                 /*
@@ -680,7 +697,7 @@ public class Game {
                 for (int i = 0; i < visitedSize; i++) {
 
                     Board visitedState = visitedStates.get(i);
-                    normalize(visitedState);
+                    //normalize(visitedState);
 
                     boolean inPrevState = identicalStates(mBoard, visitedState);
 
@@ -691,10 +708,9 @@ public class Game {
                     }
                 }
                 if (!sameState) {
-                    
 
                     Board newBoard = applyMoveCloning(n.getBoard(), move);
-                    normalize(newBoard);
+                    //normalize(newBoard);
                     visitedStates.add(newBoard);
                     Node node = new Node(newBoard);
                     node.setfCost(move.calculateF());
